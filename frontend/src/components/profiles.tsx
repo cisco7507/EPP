@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface RegistryProfile {
   id: number;
@@ -25,9 +26,9 @@ export default function Profiles() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Registry Profiles</h1>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
+      <Link href="/profiles/new" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
         Add Profile
-      </button>
+      </Link>
       <table className="table-auto w-full">
         <thead>
           <tr>
