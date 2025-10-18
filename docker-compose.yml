@@ -32,4 +32,4 @@ services:
       - redis
 
   redis:
-    image: "public.ecr.aws/bitnami/redis:latest"
+    image: "redis:latest"
