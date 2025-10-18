@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM public.ecr.aws/bitnami/node:18
+FROM node:18-alpine
 
 # Set the working directory in the container
 WORKDIR /app
