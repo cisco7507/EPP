@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic[email]
+python-jose
+passlib
+bcrypt==3.2.2
+celery
+redis
+python-multipart
+pytest
+httpx
