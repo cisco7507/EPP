@@ -123,6 +123,20 @@ def delete_profile(profile_id: int):
             return {"message": "Profile deleted"}
     raise HTTPException(status_code=404, detail="Profile not found")
 
+from epp_client.client import EPPClient
+from epp_client.commands.domain import check_domain
+
+# Pydantic model for the domain check request
+class DomainCheckRequest(BaseModel):
+    domain_name: str
+    profile_id: int
+
+# Pydantic model for the domain check response
+class DomainCheckResponse(BaseModel):
+    availability: bool
+    request_xml: str
+    response_xml: str
+
 # Batch Operations API
 from fastapi import File, UploadFile
 from celery.result import AsyncResult
@@ -169,3 +183,52 @@ def get_job_status(job_id: str):
             "result": None
         }
     return response
+
+# Helper to parse domain availability from XML
+def _parse_domain_availability(xml_response: str, domain_name: str) -> bool:
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(xml_response)
+    ns = {
+        'epp': 'urn:ietf:params:xml:ns:epp-1.0',
+        'domain': 'urn:ietf:params:xml:ns:domain-1.0'
+    }
+    # Find the <domain:name> element with the matching domain name
+    name_element = root.find(f".//domain:cd[domain:name='{domain_name}']/domain:name", ns)
+    if name_element is not None:
+        return name_element.attrib.get('avail') == '1'
+    return False
+
+@app.post("/api/domains/check", response_model=DomainCheckResponse)
+async def domain_check(request: DomainCheckRequest):
+    profile = get_profile(request.profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    client = EPPClient(
+        host=profile.host,
+        port=profile.port,
+        username=profile.username,
+        password=profile.password,
+        ssl_certfile=profile.ssl_certfile,
+        ssl_keyfile=profile.ssl_keyfile
+    )
+
+    try:
+        client.connect()
+        client.login()
+
+        request_xml = check_domain(request.domain_name)
+        response_xml = client.send_command(request_xml)
+
+        availability = _parse_domain_availability(response_xml, request.domain_name)
+
+        return DomainCheckResponse(
+            availability=availability,
+            request_xml=request_xml,
+            response_xml=response_xml
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if client.sock:
+            client.logout()

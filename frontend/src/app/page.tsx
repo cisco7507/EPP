@@ -8,8 +8,11 @@ export default function Home() {
         <p className="text-lg mb-8">
           Manage your domain registry operations with ease.
         </p>
-        <Link href="/profiles" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded text-xl">
+        <Link href="/profiles" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded text-xl mr-4">
           Go to Registry Profiles
+        </Link>
+        <Link href="/domains/check" className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded text-xl">
+          Check a Domain
         </Link>
       </div>
     </main>
