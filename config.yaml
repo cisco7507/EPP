@@ -1,0 +1,9 @@
+epp:
+  host: "ote.verisign-grs.com"
+  port: 700
+  username: "your_username"
+  password: "your_password"
+  ssl_certfile: "/path/to/your/cert.pem"
+  ssl_keyfile: "/path/to/your/key.pem"
+logging:
+  level: "INFO"
